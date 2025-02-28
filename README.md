@@ -59,4 +59,4 @@ Contributions are welcome! If you'd like to improve GifTools, please follow thes
 
 ## License
 
-Distributed under the MIT License. See the [LICENSE](LICENSE) file for details.
+Distributed under the GNU GENERAL PUBLIC LICENSE License. See the [LICENSE](LICENSE) file for details.
