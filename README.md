@@ -35,6 +35,7 @@ Download the executable:
 [ResizeGif.exe](https://github.com/Kavex/GifTools/releases/download/ResizeGif/ResizeGif.exe)
 
 Requires: ffmpeg
+
 ---
 
 ### Edit GIF Frames
@@ -45,6 +46,7 @@ Download the executable:
 [EditGifFrames.exe](https://github.com/Kavex/GifTools/releases/download/EditGifFrames/EditGifFrames.exe)
 
 Requires: ffmpeg
+
 ---
 
 ### Add Text to GIF
@@ -55,6 +57,7 @@ Download the executable:
 [AddTextToGIF.exe](https://github.com/Kavex/GifTools/releases/download/AddTextToGif/AddTextToGif.exe)
 
 Requires: pillow
+
 ---
 
 
