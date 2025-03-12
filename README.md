@@ -23,6 +23,8 @@ GifTools is a suite of lightweight tools for editing GIFs. Whether you need to c
 Download the executable:  
 [ConvertMP4toGIF.exe](https://github.com/Kavex/GifTools/releases/download/ConvertMP4toGIF/ConvertMP4toGIF.exe)
 
+Requires: ffmpeg
+
 ---
 
 ### Resize GIF
@@ -32,6 +34,7 @@ Download the executable:
 Download the executable:  
 [ResizeGif.exe](https://github.com/Kavex/GifTools/releases/download/ResizeGif/ResizeGif.exe)
 
+Requires: ffmpeg
 ---
 
 ### Edit GIF Frames
@@ -41,6 +44,7 @@ Download the executable:
 Download the executable:  
 [EditGifFrames.exe](https://github.com/Kavex/GifTools/releases/download/EditGifFrames/EditGifFrames.exe)
 
+Requires: ffmpeg
 ---
 
 ### Add Text to GIF
@@ -50,6 +54,7 @@ Download the executable:
 Download the executable:
 [AddTextToGIF.exe](https://github.com/Kavex/GifTools/releases/download/AddTextToGif/AddTextToGif.exe)
 
+Requires: pillow
 ---
 
 
