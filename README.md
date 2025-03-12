@@ -40,6 +40,15 @@ Download the executable:
 
 ---
 
+### Add Text to GIF
+
+![AddTextToGif](https://github.com/user-attachments/assets/1ed5e095-e5fd-40cc-b78a-244d826ad9d5)
+
+Download the executable:
+[AddTextToGIF.exe](https://github.com/Kavex/GifTools/releases/download/AddTextToGif/AddTextToGif.exe)
+
+---
+
 
 ## How to Use
 
