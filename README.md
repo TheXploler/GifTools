@@ -7,6 +7,7 @@ GifTools is a suite of lightweight tools for editing GIFs. Whether you need to c
 - **Convert MP4 to GIF:** Transform your MP4 videos into high-quality GIFs quickly and easily.
 - **Resize GIF:** Adjust the dimensions of your GIFs to fit your needs.
 - **Edit Gif Frames:** Add frames or r emove Frames from any GIFs or Create GIFs from single images
+- **Add Text:** Add text to spice up that meme! 
 - **ffmpeg** Tools only uses standard python libs and ffmpeg so many can run them from source. https://www.ffmpeg.org/
 
 Mmmmm love me some ffmpeg!!
