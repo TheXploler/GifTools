@@ -252,19 +252,34 @@ def start_resize_gif():
     frame_scale = tk.Frame(root)
     tk.Label(frame_scale, text="Scale Percentage:").grid(
         row=0, column=0, padx=5, pady=5)
-    scale_slider = tk.Scale(frame_scale, from_=10,
-                            to=200, orient=tk.HORIZONTAL)
+
+    def update_scale_label(value):
+        scale_value_label.config(text=f"Current Scale: {value}%")
+
+    scale_slider = tk.Scale(frame_scale, from_=10, to=200,
+                            orient=tk.HORIZONTAL, command=update_scale_label)
     scale_slider.set(100)  # 100% means no scaling.
     scale_slider.grid(row=0, column=1, padx=5, pady=5)
+
+    scale_value_label = tk.Label(frame_scale, text="Current Scale: 100%")
+    scale_value_label.grid(row=0, column=2, padx=5, pady=5)
 
     # --- Frame for "Target File Size" mode ---
     frame_target = tk.Frame(root)
     tk.Label(frame_target, text="Target File Size (MB):").grid(
         row=0, column=0, padx=5, pady=5)
+
+    def update_targetFS_label(value):
+        targetFS_value_label.config(text=f"Target File Size: {value} MB")
+
     target_slider = tk.Scale(frame_target, from_=0.1, to=20,
-                             resolution=0.1, orient=tk.HORIZONTAL)
+                             resolution=0.1, orient=tk.HORIZONTAL, command=update_targetFS_label)
     target_slider.set(10)  # Default target of 10 MB.
     target_slider.grid(row=0, column=1, padx=5, pady=5)
+
+    targetFS_value_label = tk.Label(
+        frame_target, text="Target Tile Size: 10 MB")
+    targetFS_value_label.grid(row=0, column=2, padx=5, pady=5)
 
     # Initially show the "Enter Resolution" frame.
     frame_resolution.grid(row=4, column=0, columnspan=3,

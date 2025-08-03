@@ -6,7 +6,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 
 
-class GifEditor(tk.Tk):
+class GifEditor(tk.Toplevel):
     def __init__(self):
         super().__init__()
         self.title("GIF Frame Editor")

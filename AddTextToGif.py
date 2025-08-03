@@ -286,7 +286,7 @@ class GifTextEditor:
 
 
 def start_add_text_to_gif():
-    root = tk.Tk()
+    root = tk.Toplevel()
     app = GifTextEditor(root)
     root.mainloop()
 
