@@ -3,17 +3,18 @@ from tkinter import filedialog, colorchooser, ttk, messagebox
 from PIL import Image, ImageTk, ImageDraw, ImageFont, ImageSequence
 import os
 
+
 class GifTextEditor:
     def __init__(self, root):
         self.root = root
         self.root.title("GIF Text Editor")
 
         self.gif_image = None
-        self.frames = []       
-        self.duration = 100    
+        self.frames = []
+        self.duration = 100
         self.preview_image = None
 
-        self.text_x = 50  
+        self.text_x = 50
         self.text_y = 50
 
         self.text_var = tk.StringVar(value="Enter your text here")
@@ -39,17 +40,20 @@ class GifTextEditor:
 
         preview_frame = tk.Frame(root, bd=2, relief=tk.SUNKEN)
         preview_frame.pack(side=tk.RIGHT, padx=5, pady=5)
-        
-        self.canvas = tk.Canvas(preview_frame, width=500, height=500, bg="grey")
+
+        self.canvas = tk.Canvas(
+            preview_frame, width=500, height=500, bg="grey")
         self.canvas.pack()
         self.canvas.bind("<ButtonPress-1>", self.on_mouse_down)
         self.canvas.bind("<B1-Motion>", self.on_mouse_drag)
 
-        load_btn = tk.Button(control_frame, text="Load GIF", command=self.load_gif)
+        load_btn = tk.Button(
+            control_frame, text="Load GIF", command=self.load_gif)
         load_btn.pack(pady=2, fill=tk.X)
 
         tk.Label(control_frame, text="Text:").pack(anchor="w")
-        text_entry = tk.Entry(control_frame, textvariable=self.text_var, width=40)
+        text_entry = tk.Entry(
+            control_frame, textvariable=self.text_var, width=40)
         text_entry.pack(pady=2)
         self.text_var.trace_add("write", lambda *args: self.update_preview())
 
@@ -63,7 +67,8 @@ class GifTextEditor:
         tk.Spinbox(control_frame, from_=10, to=200, textvariable=self.font_size_var,
                    command=self.update_preview).pack(pady=2, fill=tk.X)
 
-        tk.Button(control_frame, text="Choose Font Color", command=self.choose_font_color).pack(pady=2, fill=tk.X)
+        tk.Button(control_frame, text="Choose Font Color",
+                  command=self.choose_font_color).pack(pady=2, fill=tk.X)
 
         tk.Label(control_frame, text="Textbox Width (px):").pack(anchor="w")
         tk.Spinbox(control_frame, from_=50, to=1000, textvariable=self.textbox_width_var,
@@ -74,16 +79,19 @@ class GifTextEditor:
         tk.Label(control_frame, text="Shadow Size:").pack(anchor="w")
         tk.Spinbox(control_frame, from_=1, to=20, textvariable=self.shadow_size_var,
                    command=self.update_preview).pack(pady=2, fill=tk.X)
-        tk.Button(control_frame, text="Choose Shadow Color", command=self.choose_shadow_color).pack(pady=2, fill=tk.X)
+        tk.Button(control_frame, text="Choose Shadow Color",
+                  command=self.choose_shadow_color).pack(pady=2, fill=tk.X)
 
         tk.Checkbutton(control_frame, text="Enable Stroke", variable=self.stroke_enabled,
                        command=self.update_preview).pack(anchor="w")
         tk.Label(control_frame, text="Stroke Size:").pack(anchor="w")
         tk.Spinbox(control_frame, from_=1, to=20, textvariable=self.stroke_size_var,
                    command=self.update_preview).pack(pady=2, fill=tk.X)
-        tk.Button(control_frame, text="Choose Stroke Color", command=self.choose_stroke_color).pack(pady=2, fill=tk.X)
+        tk.Button(control_frame, text="Choose Stroke Color",
+                  command=self.choose_stroke_color).pack(pady=2, fill=tk.X)
 
-        export_btn = tk.Button(control_frame, text="Export GIF", command=self.export_gif)
+        export_btn = tk.Button(
+            control_frame, text="Export GIF", command=self.export_gif)
         export_btn.pack(pady=10, fill=tk.X)
 
     def load_gif(self):
@@ -199,14 +207,17 @@ class GifTextEditor:
 
         if self.shadow_enabled.get():
             shadow_offset = self.shadow_size_var.get()
-            shadow_pos = (self.text_x + shadow_offset, self.text_y + shadow_offset)
-            draw.multiline_text(shadow_pos, wrapped_text, font=font, fill=self.shadow_color)
+            shadow_pos = (self.text_x + shadow_offset,
+                          self.text_y + shadow_offset)
+            draw.multiline_text(shadow_pos, wrapped_text,
+                                font=font, fill=self.shadow_color)
         if self.stroke_enabled.get():
             draw.multiline_text((self.text_x, self.text_y), wrapped_text, font=font,
                                 fill=self.font_color, stroke_width=self.stroke_size_var.get(),
                                 stroke_fill=self.stroke_color)
         else:
-            draw.multiline_text((self.text_x, self.text_y), wrapped_text, font=font, fill=self.font_color)
+            draw.multiline_text((self.text_x, self.text_y),
+                                wrapped_text, font=font, fill=self.font_color)
 
         self.preview_image = ImageTk.PhotoImage(preview)
         self.canvas.delete("all")
@@ -214,7 +225,8 @@ class GifTextEditor:
 
     def on_mouse_down(self, event):
         font = self.get_font(self.font_size_var.get())
-        wrapped_text = self.wrap_text(self.text_var.get(), font, self.textbox_width_var.get())
+        wrapped_text = self.wrap_text(
+            self.text_var.get(), font, self.textbox_width_var.get())
         text_size = self.get_multiline_text_size(wrapped_text, font)
         x0, y0 = self.text_x, self.text_y
         x1, y1 = x0 + text_size[0], y0 + text_size[1]
@@ -251,22 +263,27 @@ class GifTextEditor:
             draw = ImageDraw.Draw(frame)
             if self.shadow_enabled.get():
                 shadow_offset = self.shadow_size_var.get()
-                shadow_pos = (self.text_x + shadow_offset, self.text_y + shadow_offset)
-                draw.multiline_text(shadow_pos, wrapped_text, font=font, fill=self.shadow_color)
+                shadow_pos = (self.text_x + shadow_offset,
+                              self.text_y + shadow_offset)
+                draw.multiline_text(shadow_pos, wrapped_text,
+                                    font=font, fill=self.shadow_color)
             if self.stroke_enabled.get():
                 draw.multiline_text((self.text_x, self.text_y), wrapped_text, font=font,
                                     fill=self.font_color, stroke_width=self.stroke_size_var.get(),
                                     stroke_fill=self.stroke_color)
             else:
-                draw.multiline_text((self.text_x, self.text_y), wrapped_text, font=font, fill=self.font_color)
+                draw.multiline_text((self.text_x, self.text_y),
+                                    wrapped_text, font=font, fill=self.font_color)
             new_frames.append(frame)
 
         try:
             new_frames[0].save(out_path, save_all=True, append_images=new_frames[1:],
-                                duration=self.duration, loop=0, disposal=2)
-            messagebox.showinfo("Success", f"Exported GIF saved to:\n{out_path}")
+                               duration=self.duration, loop=0, disposal=2)
+            messagebox.showinfo(
+                "Success", f"Exported GIF saved to:\n{out_path}")
         except Exception as e:
             messagebox.showerror("Error", f"Failed to export GIF:\n{e}")
+
 
 if __name__ == "__main__":
     root = tk.Tk()

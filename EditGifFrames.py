@@ -5,13 +5,15 @@ import tempfile
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
+
 class GifEditor(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("GIF Frame Editor")
         self.geometry("800x600")
         self.wm_attributes('-toolwindow', 'True')  # Set as a tool window
-        self.frames_info = []  # Each item: { "path": <file path>, "var": BooleanVar, "widget": <Frame> }
+        # Each item: { "path": <file path>, "var": BooleanVar, "widget": <Frame> }
+        self.frames_info = []
         self.temp_dir = None
         self.create_menu()
         self.create_widgets()
@@ -21,8 +23,10 @@ class GifEditor(tk.Tk):
         # File Menu: open/reassemble/export/exit
         file_menu = tk.Menu(menubar, tearoff=0)
         file_menu.add_command(label="Open GIF", command=self.open_gif)
-        file_menu.add_command(label="Reassemble GIF", command=self.reassemble_gif)
-        file_menu.add_command(label="Export Frames", command=self.export_frames)
+        file_menu.add_command(label="Reassemble GIF",
+                              command=self.reassemble_gif)
+        file_menu.add_command(label="Export Frames",
+                              command=self.export_frames)
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=self.quit)
         menubar.add_cascade(label="File", menu=file_menu)
@@ -30,7 +34,8 @@ class GifEditor(tk.Tk):
         # Actions Menu: add, remove, select all
         actions_menu = tk.Menu(menubar, tearoff=0)
         actions_menu.add_command(label="Add Frame", command=self.add_frame)
-        actions_menu.add_command(label="Remove Selected Frames", command=self.remove_selected)
+        actions_menu.add_command(
+            label="Remove Selected Frames", command=self.remove_selected)
         actions_menu.add_command(label="Select All", command=self.select_all)
         menubar.add_cascade(label="Actions", menu=actions_menu)
 
@@ -44,20 +49,25 @@ class GifEditor(tk.Tk):
         self.fps_entry = tk.Entry(control_frame, width=5)
         self.fps_entry.pack(side=tk.LEFT, padx=5)
         self.fps_entry.insert(0, "10")
-        tk.Button(control_frame, text="Reassemble GIF", command=self.reassemble_gif).pack(side=tk.LEFT, padx=5)
+        tk.Button(control_frame, text="Reassemble GIF",
+                  command=self.reassemble_gif).pack(side=tk.LEFT, padx=5)
 
         # Canvas with scrollbar for displaying frame thumbnails
         self.canvas = tk.Canvas(self, borderwidth=0)
         self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL, command=self.canvas.yview)
+        self.scrollbar = tk.Scrollbar(
+            self, orient=tk.VERTICAL, command=self.canvas.yview)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
         self.thumb_container = tk.Frame(self.canvas)
-        self.canvas.create_window((0, 0), window=self.thumb_container, anchor="nw")
-        self.thumb_container.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+        self.canvas.create_window(
+            (0, 0), window=self.thumb_container, anchor="nw")
+        self.thumb_container.bind("<Configure>", lambda e: self.canvas.configure(
+            scrollregion=self.canvas.bbox("all")))
 
     def open_gif(self):
-        gif_path = filedialog.askopenfilename(title="Select GIF file", filetypes=[("GIF files", "*.gif")])
+        gif_path = filedialog.askopenfilename(
+            title="Select GIF file", filetypes=[("GIF files", "*.gif")])
         if not gif_path:
             return
 
@@ -70,7 +80,8 @@ class GifEditor(tk.Tk):
         extract_pattern = os.path.join(self.temp_dir, "frame_%03d.ppm")
         cmd = ["ffmpeg", "-i", gif_path, extract_pattern]
         try:
-            subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            subprocess.run(cmd, check=True, stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE)
         except subprocess.CalledProcessError as e:
             messagebox.showerror("Error", f"Error extracting frames:\n{e}")
             return
@@ -81,11 +92,13 @@ class GifEditor(tk.Tk):
         self.frames_info.clear()
 
         # Load extracted frames (sorted by filename) into the UI
-        files = sorted([f for f in os.listdir(self.temp_dir) if f.startswith("frame_") and f.endswith(".ppm")])
+        files = sorted([f for f in os.listdir(self.temp_dir)
+                       if f.startswith("frame_") and f.endswith(".ppm")])
         for file in files:
             path = os.path.join(self.temp_dir, file)
             self.add_frame_to_list(path)
-        messagebox.showinfo("Frames Loaded", f"Loaded {len(self.frames_info)} frames from the GIF.")
+        messagebox.showinfo(
+            "Frames Loaded", f"Loaded {len(self.frames_info)} frames from the GIF.")
 
     def add_frame_to_list(self, path):
         # Create a UI container for the frame thumbnail and a deletion checkbox
@@ -98,7 +111,8 @@ class GifEditor(tk.Tk):
             factor = max(img.width() // 100, img.height() // 100)
             thumb = img.subsample(factor, factor) if factor > 1 else img
         except Exception as e:
-            messagebox.showerror("Error", f"Error loading image:\n{e}\nFile: {path}")
+            messagebox.showerror(
+                "Error", f"Error loading image:\n{e}\nFile: {path}")
             return
         label = tk.Label(frame_ui, image=thumb)
         label.image = thumb  # Keep a reference so it doesn't get garbage-collected
@@ -138,9 +152,11 @@ class GifEditor(tk.Tk):
         # Convert the selected image to PPM using ffmpeg so that tkinter can load it
         cmd = ["ffmpeg", "-y", "-i", img_path, dest]
         try:
-            subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            subprocess.run(cmd, check=True, stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE)
         except subprocess.CalledProcessError as e:
-            messagebox.showerror("Error", f"Error converting image to PPM:\n{e}")
+            messagebox.showerror(
+                "Error", f"Error converting image to PPM:\n{e}")
             return
         self.add_frame_to_list(dest)
         messagebox.showinfo("Frame Added", "New frame added successfully.")
@@ -178,7 +194,8 @@ class GifEditor(tk.Tk):
             output_file
         ]
         try:
-            subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            subprocess.run(cmd, check=True, stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE)
             messagebox.showinfo("Success", f"New GIF saved as:\n{output_file}")
         except subprocess.CalledProcessError as e:
             messagebox.showerror("Error", f"Error reassembling GIF:\n{e}")
@@ -189,13 +206,16 @@ class GifEditor(tk.Tk):
         if not self.frames_info:
             messagebox.showerror("Error", "No frames available to export!")
             return
-        dest_dir = filedialog.askdirectory(title="Select folder to export frames")
+        dest_dir = filedialog.askdirectory(
+            title="Select folder to export frames")
         if not dest_dir:
             return
         for idx, fi in enumerate(self.frames_info):
             filename = f"frame_{idx:03d}.ppm"
             shutil.copy(fi["path"], os.path.join(dest_dir, filename))
-        messagebox.showinfo("Exported", f"Exported {len(self.frames_info)} frames to {dest_dir}.")
+        messagebox.showinfo(
+            "Exported", f"Exported {len(self.frames_info)} frames to {dest_dir}.")
+
 
 if __name__ == "__main__":
     app = GifEditor()

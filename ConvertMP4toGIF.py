@@ -4,17 +4,21 @@ import subprocess
 import os
 import tempfile
 
+
 def browse_input():
     file_path = filedialog.askopenfilename(filetypes=[("MP4 files", "*.mp4")])
     if file_path:
         entry_input.delete(0, tk.END)
         entry_input.insert(0, file_path)
 
+
 def browse_output():
-    file_path = filedialog.asksaveasfilename(defaultextension=".gif", filetypes=[("GIF files", "*.gif")])
+    file_path = filedialog.asksaveasfilename(
+        defaultextension=".gif", filetypes=[("GIF files", "*.gif")])
     if file_path:
         entry_output.delete(0, tk.END)
         entry_output.insert(0, file_path)
+
 
 def convert_video():
     input_file = entry_input.get()
@@ -22,7 +26,7 @@ def convert_video():
     fps = entry_fps.get()
     width = entry_width.get()
     height = entry_height.get()
-    
+
     if not os.path.exists(input_file):
         messagebox.showerror("Error", "Input file does not exist.")
         return
@@ -70,22 +74,27 @@ def convert_video():
     except Exception as e:
         messagebox.showerror("Error", f"An error occurred:\n{e}")
 
+
 # Set up the GUI
 root = tk.Tk()
 root.title("MP4 to GIF Converter")
 root.wm_attributes('-toolwindow', 'True')  # Set as a tool window
 
 # Input file selection
-tk.Label(root, text="Input MP4 File:").grid(row=0, column=0, padx=5, pady=5, sticky="e")
+tk.Label(root, text="Input MP4 File:").grid(
+    row=0, column=0, padx=5, pady=5, sticky="e")
 entry_input = tk.Entry(root, width=50)
 entry_input.grid(row=0, column=1, padx=5, pady=5)
-tk.Button(root, text="Browse", command=browse_input).grid(row=0, column=2, padx=5, pady=5)
+tk.Button(root, text="Browse", command=browse_input).grid(
+    row=0, column=2, padx=5, pady=5)
 
 # Output file selection
-tk.Label(root, text="Output GIF File:").grid(row=1, column=0, padx=5, pady=5, sticky="e")
+tk.Label(root, text="Output GIF File:").grid(
+    row=1, column=0, padx=5, pady=5, sticky="e")
 entry_output = tk.Entry(root, width=50)
 entry_output.grid(row=1, column=1, padx=5, pady=5)
-tk.Button(root, text="Browse", command=browse_output).grid(row=1, column=2, padx=5, pady=5)
+tk.Button(root, text="Browse", command=browse_output).grid(
+    row=1, column=2, padx=5, pady=5)
 
 # FPS input with pre-filled value "30"
 tk.Label(root, text="FPS:").grid(row=2, column=0, padx=5, pady=5, sticky="e")
@@ -94,16 +103,19 @@ entry_fps.grid(row=2, column=1, padx=5, pady=5, sticky="w")
 entry_fps.insert(0, "30")
 
 # Output size input with pre-filled values 640x480
-tk.Label(root, text="Output Size (width x height):").grid(row=3, column=0, padx=5, pady=5, sticky="e")
+tk.Label(root, text="Output Size (width x height):").grid(
+    row=3, column=0, padx=5, pady=5, sticky="e")
 entry_width = tk.Entry(root, width=10)
-entry_width.grid(row=3, column=1, padx=(5,0), pady=5, sticky="w")
+entry_width.grid(row=3, column=1, padx=(5, 0), pady=5, sticky="w")
 entry_width.insert(0, "640")
-tk.Label(root, text="x").grid(row=3, column=1, padx=(80,0), pady=5, sticky="w")
+tk.Label(root, text="x").grid(
+    row=3, column=1, padx=(80, 0), pady=5, sticky="w")
 entry_height = tk.Entry(root, width=10)
-entry_height.grid(row=3, column=1, padx=(100,0), pady=5, sticky="w")
+entry_height.grid(row=3, column=1, padx=(100, 0), pady=5, sticky="w")
 entry_height.insert(0, "480")
 
 # Convert button
-tk.Button(root, text="Convert", command=convert_video).grid(row=4, column=1, padx=5, pady=15)
+tk.Button(root, text="Convert", command=convert_video).grid(
+    row=4, column=1, padx=5, pady=15)
 
 root.mainloop()

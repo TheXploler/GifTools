@@ -1,13 +1,14 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import os
-from pygifsicle import gifsicle  # Changed to import gifsicle directly
+from pygifsicle import gifsicle
+import ttkbootstrap as ttk
 
 
 def browse_input():
     file_path = filedialog.askopenfilename(filetypes=[("GIF files", "*.gif")])
     if file_path:
-        entry_input.delete(0, tk.END)
+        entry_input.delete(0, ttk.END)
         entry_input.insert(0, file_path)
 
 
@@ -15,7 +16,7 @@ def browse_output():
     file_path = filedialog.asksaveasfilename(
         defaultextension=".gif", filetypes=[("GIF files", "*.gif")])
     if file_path:
-        entry_output.delete(0, tk.END)
+        entry_output.delete(0, ttk.END)
         entry_output.insert(0, file_path)
 
 
@@ -75,58 +76,58 @@ def toggle_options():
 
 
 def update_color_count(value):
-    entry_color_count.delete(0, tk.END)
+    entry_color_count.delete(0, ttk.END)
     entry_color_count.insert(0, value)
 
 
 def update_quality(value):
-    entry_quality.delete(0, tk.END)
+    entry_quality.delete(0, ttk.END)
     entry_quality.insert(0, value)
 
 
 # Set up the GUI
-root = tk.Tk()
+root = ttk.Window(themename="superhero")
 root.title("GIF Compressor")
 root.wm_attributes('-toolwindow', 'True')  # Set as a tool window
 
 # Input file selection
-tk.Label(root, text="Input GIF File:").grid(
+ttk.Label(root, text="Input GIF File:").grid(
     row=0, column=0, padx=5, pady=5, sticky="e")
-entry_input = tk.Entry(root, width=50)
+entry_input = ttk.Entry(root, width=50)
 entry_input.grid(row=0, column=1, padx=5, pady=5)
-tk.Button(root, text="Browse", command=browse_input).grid(
+ttk.Button(root, text="Browse", command=browse_input).grid(
     row=0, column=2, padx=5, pady=5)
 
 # Output file selection
-tk.Label(root, text="Output GIF File:").grid(
+ttk.Label(root, text="Output GIF File:").grid(
     row=1, column=0, padx=5, pady=5, sticky="e")
-entry_output = tk.Entry(root, width=50)
+entry_output = ttk.Entry(root, width=50)
 entry_output.grid(row=1, column=1, padx=5, pady=5)
-tk.Button(root, text="Browse", command=browse_output).grid(
+ttk.Button(root, text="Browse", command=browse_output).grid(
     row=1, column=2, padx=5, pady=5)
 
 # Color reduction option
-var_color = tk.BooleanVar()
-tk.Checkbutton(root, text="Enable Color Reduction", variable=var_color,
+var_color = ttk.BooleanVar()
+ttk.Checkbutton(root, text="Enable Color Reduction", variable=var_color,
                command=toggle_options).grid(row=6, column=1, padx=5, pady=5, sticky="w")
-label_color_count = tk.Label(root, text="Color Count (2-256):")
+label_color_count = ttk.Label(root, text="Color Count (2-256):")
 slider_color_count = tk.Scale(
-    root, from_=2, to=256, orient=tk.HORIZONTAL, command=update_color_count)
-entry_color_count = tk.Entry(root)
+    root, from_=2, to=256, orient=ttk.HORIZONTAL, command=update_color_count)
+entry_color_count = ttk.Entry(root)
 entry_color_count.insert(0, "2")  # default value
 
 # Lossy GIF option
-var_lossy = tk.BooleanVar()
-tk.Checkbutton(root, text="Enable Lossy GIF", variable=var_lossy,
+var_lossy = ttk.BooleanVar()
+ttk.Checkbutton(root, text="Enable Lossy GIF", variable=var_lossy,
                command=toggle_options).grid(row=6, column=2, padx=5, pady=5, sticky="w")
-label_quality = tk.Label(root, text="Quality (30-200):")
+label_quality = ttk.Label(root, text="Quality (30-200):")
 slider_quality = tk.Scale(root, from_=30, to=200,
-                          orient=tk.HORIZONTAL, command=update_quality)
-entry_quality = tk.Entry(root)
+                          orient=ttk.HORIZONTAL, command=update_quality)
+entry_quality = ttk.Entry(root)
 entry_quality.insert(0, "30")  # default value
 
 # Compress button
-tk.Button(root, text="Compress", command=compress_gif).grid(
+ttk.Button(root, text="Compress", command=compress_gif).grid(
     row=9, column=1, padx=5, pady=15)
 
 root.mainloop()
