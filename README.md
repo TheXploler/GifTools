@@ -10,64 +10,33 @@ GifTools is a suite of lightweight tools for editing GIFs. Whether you need to c
 - **Edit Gif Frames:** Add frames or remove Frames from any GIFs or Create GIFs from single images
 - **Add Text:** Add text to spice up that meme!
 
-### Requirements
-
-- ffmpeg
-- pillow
-- pygifsicle
-
 ## Tools
+| Tool                | Description                         | Demo                                           |
+|---------------------|-------------------------------------|------------------------------------------------|
+| Convert MP4 to GIF  | Convert MP4 videos to GIFs          | ![Convert MP4 to GIF](.github/Mp42Gif.png)     |
+| Resize GIF          | Change GIF dimensions               | ![Resize GIF](.github/GifResize.png)           |
+| Compress GIF        | Reduce GIF file size                | ![Compress GIF](.github/GifCompress.png)       |
+| Edit GIF Frames     | Add/remove frames in GIFs           | ![Edit GIF Frames](.github/GifFrameEditor.png) |
+| Add Text to GIF     | Overlay text on GIFs                | ![AddTextToGif](.github/GifTextEditor.png)     |
 
-### Convert MP4 to GIF
+## Installation
 
-![Convert MP4 to GIF](https://github.com/user-attachments/assets/71a51a89-cfcd-4efa-8d33-a7b8de91bd1d)
+Use [pip](https://pip.pypa.io/en/stable/) to install requirements.txt
 
-Download the executable:  
-[ConvertMP4toGIF.exe](https://github.com/Kavex/GifTools/releases/download/ConvertMP4toGIF/ConvertMP4toGIF.exe)
+```bash
+  pip install -r requirements.txt
+```
 
-Requires: ffmpeg
+Or you can download the [executable](https://github.com/TheXploler/GifTools/releases/latest)
 
----
+> [!IMPORTANT]
+> On **Windows**, you may see a warning message indicating that the app is from an unknown publisher. Click **More info** and then **Run anyway** to proceed.
 
-### Resize GIF
+## Run
 
-![Resize GIF](https://github.com/user-attachments/assets/a771da36-dc46-4274-aaaf-ae6fad65af01)
-
-Download the executable:  
-[ResizeGif.exe](https://github.com/Kavex/GifTools/releases/download/ResizeGif/ResizeGif.exe)
-
-Requires: ffmpeg
-
----
-
-### Edit GIF Frames
-
-![image](https://github.com/user-attachments/assets/a8c77480-47db-46b0-a73b-ca7594a8fff8)
-
-Download the executable:  
-[EditGifFrames.exe](https://github.com/Kavex/GifTools/releases/download/EditGifFrames/EditGifFrames.exe)
-
-Requires: ffmpeg
-
----
-
-### Add Text to GIF
-
-![AddTextToGif](https://github.com/user-attachments/assets/1ed5e095-e5fd-40cc-b78a-244d826ad9d5)
-
-Download the executable:
-[AddTextToGIF.exe](https://github.com/Kavex/GifTools/releases/download/AddTextToGif/AddTextToGif.exe)
-
-Requires: pillow
-
----
-
-
-## How to Use
-
-1. **Download** the executable for the desired tool from the links above.
-2. **Run** the executable on your machine.
-3. **Follow** the on-screen options to complete your GIF editing task.
+```bash
+python "GifTools.py"
+```
 
 ## Contributing
 
