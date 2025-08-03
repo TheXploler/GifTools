@@ -1,1 +1,4 @@
-*.gif
+output
+pygifsicle
+TEST
+__pycache__

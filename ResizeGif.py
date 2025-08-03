@@ -194,78 +194,82 @@ def convert_gif():
     except Exception as e:
         messagebox.showerror("Error", f"An error occurred:\n{e}")
 
+def start_resize_gif():
+    global entry_input, entry_output, entry_fps, mode_var, entry_width, entry_height, scale_slider, target_slider, frame_resolution, frame_scale, frame_target
+    # Set up the GUI.
+    root = tk.Tk()
+    root.title("GIF to GIF Converter with Resize Modes")
+    root.wm_attributes('-toolwindow', 'True')  # Set as a tool window
 
-# Set up the GUI.
-root = tk.Tk()
-root.title("GIF to GIF Converter with Resize Modes")
-root.wm_attributes('-toolwindow', 'True')  # Set as a tool window
+    # Input file selection.
+    tk.Label(root, text="Input GIF File:").grid(
+        row=0, column=0, padx=5, pady=5, sticky="e")
+    entry_input = tk.Entry(root, width=50)
+    entry_input.grid(row=0, column=1, padx=5, pady=5)
+    tk.Button(root, text="Browse", command=browse_input).grid(
+        row=0, column=2, padx=5, pady=5)
 
-# Input file selection.
-tk.Label(root, text="Input GIF File:").grid(
-    row=0, column=0, padx=5, pady=5, sticky="e")
-entry_input = tk.Entry(root, width=50)
-entry_input.grid(row=0, column=1, padx=5, pady=5)
-tk.Button(root, text="Browse", command=browse_input).grid(
-    row=0, column=2, padx=5, pady=5)
+    # Output file selection.
+    tk.Label(root, text="Output GIF File:").grid(
+        row=1, column=0, padx=5, pady=5, sticky="e")
+    entry_output = tk.Entry(root, width=50)
+    entry_output.grid(row=1, column=1, padx=5, pady=5)
+    tk.Button(root, text="Browse", command=browse_output).grid(
+        row=1, column=2, padx=5, pady=5)
 
-# Output file selection.
-tk.Label(root, text="Output GIF File:").grid(
-    row=1, column=0, padx=5, pady=5, sticky="e")
-entry_output = tk.Entry(root, width=50)
-entry_output.grid(row=1, column=1, padx=5, pady=5)
-tk.Button(root, text="Browse", command=browse_output).grid(
-    row=1, column=2, padx=5, pady=5)
+    # FPS input.
+    tk.Label(root, text="FPS:").grid(row=2, column=0, padx=5, pady=5, sticky="e")
+    entry_fps = tk.Entry(root)
+    entry_fps.grid(row=2, column=1, padx=5, pady=5, sticky="w")
+    entry_fps.insert(0, "30")  # default to 30 FPS
 
-# FPS input.
-tk.Label(root, text="FPS:").grid(row=2, column=0, padx=5, pady=5, sticky="e")
-entry_fps = tk.Entry(root)
-entry_fps.grid(row=2, column=1, padx=5, pady=5, sticky="w")
-entry_fps.insert(0, "30")  # default to 30 FPS
+    # Dropdown for selecting resize mode.
+    tk.Label(root, text="Resize Mode:").grid(
+        row=3, column=0, padx=5, pady=5, sticky="e")
+    mode_var = tk.StringVar(root)
+    mode_options = ["Enter Resolution", "Scale Percentage", "Target File Size"]
+    mode_var.set(mode_options[0])
+    mode_menu = tk.OptionMenu(root, mode_var, *mode_options, command=update_mode)
+    mode_menu.grid(row=3, column=1, padx=5, pady=5, sticky="w")
 
-# Dropdown for selecting resize mode.
-tk.Label(root, text="Resize Mode:").grid(
-    row=3, column=0, padx=5, pady=5, sticky="e")
-mode_var = tk.StringVar(root)
-mode_options = ["Enter Resolution", "Scale Percentage", "Target File Size"]
-mode_var.set(mode_options[0])
-mode_menu = tk.OptionMenu(root, mode_var, *mode_options, command=update_mode)
-mode_menu.grid(row=3, column=1, padx=5, pady=5, sticky="w")
+    # --- Frame for "Enter Resolution" mode ---
+    frame_resolution = tk.Frame(root)
+    tk.Label(frame_resolution, text="Width:").grid(row=0, column=0, padx=5, pady=5)
+    entry_width = tk.Entry(frame_resolution, width=10)
+    entry_width.grid(row=0, column=1, padx=5, pady=5)
+    tk.Label(frame_resolution, text="Height:").grid(
+        row=0, column=2, padx=5, pady=5)
+    entry_height = tk.Entry(frame_resolution, width=10)
+    entry_height.grid(row=0, column=3, padx=5, pady=5)
+    entry_width.insert(0, "640")
+    entry_height.insert(0, "480")
 
-# --- Frame for "Enter Resolution" mode ---
-frame_resolution = tk.Frame(root)
-tk.Label(frame_resolution, text="Width:").grid(row=0, column=0, padx=5, pady=5)
-entry_width = tk.Entry(frame_resolution, width=10)
-entry_width.grid(row=0, column=1, padx=5, pady=5)
-tk.Label(frame_resolution, text="Height:").grid(
-    row=0, column=2, padx=5, pady=5)
-entry_height = tk.Entry(frame_resolution, width=10)
-entry_height.grid(row=0, column=3, padx=5, pady=5)
-entry_width.insert(0, "640")
-entry_height.insert(0, "480")
+    # --- Frame for "Scale Percentage" mode ---
+    frame_scale = tk.Frame(root)
+    tk.Label(frame_scale, text="Scale Percentage:").grid(
+        row=0, column=0, padx=5, pady=5)
+    scale_slider = tk.Scale(frame_scale, from_=10, to=200, orient=tk.HORIZONTAL)
+    scale_slider.set(100)  # 100% means no scaling.
+    scale_slider.grid(row=0, column=1, padx=5, pady=5)
 
-# --- Frame for "Scale Percentage" mode ---
-frame_scale = tk.Frame(root)
-tk.Label(frame_scale, text="Scale Percentage:").grid(
-    row=0, column=0, padx=5, pady=5)
-scale_slider = tk.Scale(frame_scale, from_=10, to=200, orient=tk.HORIZONTAL)
-scale_slider.set(100)  # 100% means no scaling.
-scale_slider.grid(row=0, column=1, padx=5, pady=5)
+    # --- Frame for "Target File Size" mode ---
+    frame_target = tk.Frame(root)
+    tk.Label(frame_target, text="Target File Size (MB):").grid(
+        row=0, column=0, padx=5, pady=5)
+    target_slider = tk.Scale(frame_target, from_=0.1, to=20,
+                            resolution=0.1, orient=tk.HORIZONTAL)
+    target_slider.set(10)  # Default target of 10 MB.
+    target_slider.grid(row=0, column=1, padx=5, pady=5)
 
-# --- Frame for "Target File Size" mode ---
-frame_target = tk.Frame(root)
-tk.Label(frame_target, text="Target File Size (MB):").grid(
-    row=0, column=0, padx=5, pady=5)
-target_slider = tk.Scale(frame_target, from_=0.1, to=20,
-                         resolution=0.1, orient=tk.HORIZONTAL)
-target_slider.set(10)  # Default target of 10 MB.
-target_slider.grid(row=0, column=1, padx=5, pady=5)
+    # Initially show the "Enter Resolution" frame.
+    frame_resolution.grid(row=4, column=0, columnspan=3,
+                        padx=5, pady=5, sticky="w")
 
-# Initially show the "Enter Resolution" frame.
-frame_resolution.grid(row=4, column=0, columnspan=3,
-                      padx=5, pady=5, sticky="w")
+    # Convert button.
+    tk.Button(root, text="Convert", command=convert_gif).grid(
+        row=5, column=1, padx=5, pady=15)
 
-# Convert button.
-tk.Button(root, text="Convert", command=convert_gif).grid(
-    row=5, column=1, padx=5, pady=15)
+    root.mainloop()
 
-root.mainloop()
+if __name__ == "__main__":
+    start_resize_gif()

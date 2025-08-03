@@ -284,8 +284,10 @@ class GifTextEditor:
         except Exception as e:
             messagebox.showerror("Error", f"Failed to export GIF:\n{e}")
 
-
-if __name__ == "__main__":
+def start_add_text_to_gif():
     root = tk.Tk()
     app = GifTextEditor(root)
     root.mainloop()
+
+if __name__ == "__main__":
+    start_add_text_to_gif()

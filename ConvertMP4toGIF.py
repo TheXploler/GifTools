@@ -58,6 +58,7 @@ def convert_video():
         # Step 2: Use the palette to create the GIF
         gif_cmd = [
             "ffmpeg",
+            "-y",  # Force overwrite
             "-i", input_file,
             "-i", palette_file,
             "-filter_complex", f"fps={fps},scale={width}:{height}:flags=lanczos[x];[x][1:v]paletteuse",
@@ -75,47 +76,53 @@ def convert_video():
         messagebox.showerror("Error", f"An error occurred:\n{e}")
 
 
-# Set up the GUI
-root = tk.Tk()
-root.title("MP4 to GIF Converter")
-root.wm_attributes('-toolwindow', 'True')  # Set as a tool window
+def start_convert_mp4_to_gif():
+    global entry_input, entry_output, entry_fps, entry_width, entry_height
+    # Set up the GUI
+    root = tk.Tk()
+    root.title("MP4 to GIF Converter")
+    root.wm_attributes('-toolwindow', 'True')  # Set as a tool window
 
-# Input file selection
-tk.Label(root, text="Input MP4 File:").grid(
-    row=0, column=0, padx=5, pady=5, sticky="e")
-entry_input = tk.Entry(root, width=50)
-entry_input.grid(row=0, column=1, padx=5, pady=5)
-tk.Button(root, text="Browse", command=browse_input).grid(
-    row=0, column=2, padx=5, pady=5)
+    # Input file selection
+    tk.Label(root, text="Input MP4 File:").grid(
+        row=0, column=0, padx=5, pady=5, sticky="e")
+    entry_input = tk.Entry(root, width=50)
+    entry_input.grid(row=0, column=1, padx=5, pady=5)
+    tk.Button(root, text="Browse", command=browse_input).grid(
+        row=0, column=2, padx=5, pady=5)
 
-# Output file selection
-tk.Label(root, text="Output GIF File:").grid(
-    row=1, column=0, padx=5, pady=5, sticky="e")
-entry_output = tk.Entry(root, width=50)
-entry_output.grid(row=1, column=1, padx=5, pady=5)
-tk.Button(root, text="Browse", command=browse_output).grid(
-    row=1, column=2, padx=5, pady=5)
+    # Output file selection
+    tk.Label(root, text="Output GIF File:").grid(
+        row=1, column=0, padx=5, pady=5, sticky="e")
+    entry_output = tk.Entry(root, width=50)
+    entry_output.grid(row=1, column=1, padx=5, pady=5)
+    tk.Button(root, text="Browse", command=browse_output).grid(
+        row=1, column=2, padx=5, pady=5)
 
-# FPS input with pre-filled value "30"
-tk.Label(root, text="FPS:").grid(row=2, column=0, padx=5, pady=5, sticky="e")
-entry_fps = tk.Entry(root)
-entry_fps.grid(row=2, column=1, padx=5, pady=5, sticky="w")
-entry_fps.insert(0, "30")
+    # FPS input with pre-filled value "30"
+    tk.Label(root, text="FPS:").grid(
+        row=2, column=0, padx=5, pady=5, sticky="e")
+    entry_fps = tk.Entry(root)
+    entry_fps.grid(row=2, column=1, padx=5, pady=5, sticky="w")
+    entry_fps.insert(0, "30")
 
-# Output size input with pre-filled values 640x480
-tk.Label(root, text="Output Size (width x height):").grid(
-    row=3, column=0, padx=5, pady=5, sticky="e")
-entry_width = tk.Entry(root, width=10)
-entry_width.grid(row=3, column=1, padx=(5, 0), pady=5, sticky="w")
-entry_width.insert(0, "640")
-tk.Label(root, text="x").grid(
-    row=3, column=1, padx=(80, 0), pady=5, sticky="w")
-entry_height = tk.Entry(root, width=10)
-entry_height.grid(row=3, column=1, padx=(100, 0), pady=5, sticky="w")
-entry_height.insert(0, "480")
+    # Output size input with pre-filled values 640x480
+    tk.Label(root, text="Output Size (width x height):").grid(
+        row=3, column=0, padx=5, pady=5, sticky="e")
+    entry_width = tk.Entry(root, width=10)
+    entry_width.grid(row=3, column=1, padx=(5, 0), pady=5, sticky="w")
+    entry_width.insert(0, "640")
+    tk.Label(root, text="x").grid(
+        row=3, column=1, padx=(80, 0), pady=5, sticky="w")
+    entry_height = tk.Entry(root, width=10)
+    entry_height.grid(row=3, column=1, padx=(100, 0), pady=5, sticky="w")
+    entry_height.insert(0, "480")
 
-# Convert button
-tk.Button(root, text="Convert", command=convert_video).grid(
-    row=4, column=1, padx=5, pady=15)
+    # Convert button
+    tk.Button(root, text="Convert", command=convert_video).grid(
+        row=4, column=1, padx=5, pady=15)
 
-root.mainloop()
+    root.mainloop()
+
+if __name__ == "__main__":
+    start_convert_mp4_to_gif()
