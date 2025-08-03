@@ -124,5 +124,6 @@ def start_convert_mp4_to_gif():
 
     root.mainloop()
 
+
 if __name__ == "__main__":
     start_convert_mp4_to_gif()

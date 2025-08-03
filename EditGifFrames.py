@@ -216,9 +216,11 @@ class GifEditor(tk.Tk):
         messagebox.showinfo(
             "Exported", f"Exported {len(self.frames_info)} frames to {dest_dir}.")
 
+
 def start_edit_gif_frames():
     app = GifEditor()
     app.mainloop()
+
 
 if __name__ == "__main__":
     start_edit_gif_frames()
