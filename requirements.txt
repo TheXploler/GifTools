@@ -1,5 +1,4 @@
-tkinter
+PyQt6
 ffmpeg
 pillow
 pygifsicle
-ttkbootstrap
