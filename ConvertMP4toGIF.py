@@ -1,129 +1,358 @@
-import tkinter as tk
-from tkinter import filedialog, messagebox
-import subprocess
+import sys
 import os
+import subprocess
 import tempfile
+import json
+from PyQt6.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QGridLayout, QLabel, QLineEdit,
+    QPushButton, QFileDialog, QMessageBox, QHBoxLayout, QFrame, QVBoxLayout,
+    QSpinBox, QDoubleSpinBox, QSizePolicy, QStyle
+)
+from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtGui import QIcon, QAction
 
 
-def browse_input():
-    file_path = filedialog.askopenfilename(filetypes=[("MP4 files", "*.mp4")])
-    if file_path:
-        entry_input.delete(0, tk.END)
-        entry_input.insert(0, file_path)
+class VideoToGifConverter(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("MP4 to GIF Converter")
+        self.resize(650, 500)
+        self.init_ui()
 
+    def init_ui(self):
+        # Stylesheet
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color: #1e1e2e;
+            }
+            QWidget {
+                color: #cdd6f4;
+                font-family: 'Segoe UI', sans-serif;
+                font-size: 14px;
+            }
+            /* Cards */
+            QFrame#Card {
+                background-color: #313244;
+                border-radius: 10px;
+                border: 1px solid #45475a;
+            }
+            /* Inputs */
+            QLineEdit, QSpinBox, QDoubleSpinBox {
+                background-color: #181825;
+                border: 1px solid #45475a;
+                border-radius: 5px;
+                padding: 8px;
+                color: #cdd6f4;
+            }
+            QLineEdit:focus, QSpinBox:focus, QDoubleSpinBox:focus {
+                border: 1px solid #a6e3a1; /* Green accent */
+            }
+            /* Buttons */
+            QPushButton {
+                background-color: #45475a;
+                color: #ffffff;
+                border: none;
+                border-radius: 5px;
+                padding: 8px 15px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #585b70;
+            }
+            QPushButton#PrimaryBtn {
+                background-color: #a6e3a1; /* Green */
+                color: #1e1e2e;
+                font-size: 16px;
+                padding: 12px;
+            }
+            QPushButton#PrimaryBtn:hover {
+                background-color: #94e2d5;
+            }
+            QPushButton#IconBtn {
+                padding: 5px;
+                background-color: transparent;
+                border: 1px solid #45475a;
+            }
+            QPushButton#IconBtn:hover {
+                background-color: #45475a;
+            }
+            QLabel#Header {
+                color: #a6e3a1;
+                font-size: 18px;
+                font-weight: bold;
+            }
+        """)
 
-def browse_output():
-    file_path = filedialog.asksaveasfilename(
-        defaultextension=".gif", filetypes=[("GIF files", "*.gif")])
-    if file_path:
-        entry_output.delete(0, tk.END)
-        entry_output.insert(0, file_path)
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        main_layout = QVBoxLayout(central_widget)
+        main_layout.setContentsMargins(30, 30, 30, 30)
+        main_layout.setSpacing(20)
 
+        # Title
+        title_lbl = QLabel("MP4 to GIF converter")
+        title_lbl.setObjectName("Header")
+        main_layout.addWidget(title_lbl)
 
-def convert_video():
-    input_file = entry_input.get()
-    output_file = entry_output.get()
-    fps = entry_fps.get()
-    width = entry_width.get()
-    height = entry_height.get()
+        # Files
+        file_frame = QFrame()
+        file_frame.setObjectName("Card")
+        file_layout = QGridLayout(file_frame)
+        file_layout.setContentsMargins(20, 20, 20, 20)
+        file_layout.setSpacing(15)
 
-    if not os.path.exists(input_file):
-        messagebox.showerror("Error", "Input file does not exist.")
-        return
-    if not output_file:
-        messagebox.showerror("Error", "Please specify an output file.")
-        return
-    if not fps:
-        messagebox.showerror("Error", "Please enter FPS value.")
-        return
-    if not width or not height:
-        messagebox.showerror("Error", "Please enter both width and height.")
-        return
+        # Input
+        file_layout.addWidget(QLabel("Source Video:"), 0, 0)
+        self.entry_input = QLineEdit()
+        self.entry_input.setPlaceholderText("Select .mp4 file...")
+        file_layout.addWidget(self.entry_input, 0, 1)
+        self.btn_browse_input = QPushButton("📂 Browse")
+        self.btn_browse_input.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_browse_input.clicked.connect(self.browse_input)
+        file_layout.addWidget(self.btn_browse_input, 0, 2)
 
-    try:
-        # Create a temporary file for the palette
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp:
-            palette_file = tmp.name
+        # Output
+        file_layout.addWidget(QLabel("Output GIF:"), 1, 0)
+        self.entry_output = QLineEdit()
+        self.entry_output.setPlaceholderText("Save destination...")
+        file_layout.addWidget(self.entry_output, 1, 1)
+        self.btn_browse_output = QPushButton("📂 Browse")
+        self.btn_browse_output.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_browse_output.clicked.connect(self.browse_output)
+        file_layout.addWidget(self.btn_browse_output, 1, 2)
 
-        # Step 1: Generate the palette
-        palette_cmd = [
-            "ffmpeg",
-            "-y",
-            "-i", input_file,
-            "-vf", f"fps={fps},scale={width}:{height}:flags=lanczos,palettegen",
-            palette_file
-        ]
-        subprocess.run(palette_cmd, check=True)
+        main_layout.addWidget(file_frame)
 
-        # Step 2: Use the palette to create the GIF
-        gif_cmd = [
-            "ffmpeg",
-            "-y",  # Force overwrite
-            "-i", input_file,
-            "-i", palette_file,
-            "-filter_complex", f"fps={fps},scale={width}:{height}:flags=lanczos[x];[x][1:v]paletteuse",
-            output_file
-        ]
-        subprocess.run(gif_cmd, check=True)
+        # Settings
+        settings_frame = QFrame()
+        settings_frame.setObjectName("Card")
+        settings_layout = QVBoxLayout(settings_frame)
+        settings_layout.setContentsMargins(20, 20, 20, 20)
+        settings_layout.setSpacing(15)
 
-        # Remove the temporary palette file
-        os.remove(palette_file)
+        settings_layout.addWidget(QLabel("Encoding Options"))
 
-        messagebox.showinfo("Success", "Conversion completed successfully!")
-    except subprocess.CalledProcessError as e:
-        messagebox.showerror("Error", f"Conversion failed:\n{e}")
-    except Exception as e:
-        messagebox.showerror("Error", f"An error occurred:\n{e}")
+        # Grid for options
+        opt_grid = QGridLayout()
+        opt_grid.setSpacing(15)
 
+        # FPS
+        opt_grid.addWidget(QLabel("Frame Rate (FPS):"), 0, 0)
 
-def start_convert_mp4_to_gif():
-    global entry_input, entry_output, entry_fps, entry_width, entry_height
-    # Set up the GUI
-    root = tk.Tk()
-    root.title("MP4 to GIF Converter")
-    root.wm_attributes('-toolwindow', 'True')  # Set as a tool window
+        fps_container = QHBoxLayout()
+        self.spin_fps = QDoubleSpinBox()
+        self.spin_fps.setRange(1.0, 144.0)
+        self.spin_fps.setValue(30.0)
+        self.spin_fps.setButtonSymbols(QDoubleSpinBox.ButtonSymbols.NoButtons)
+        self.spin_fps.setSuffix(" fps")
+        fps_container.addWidget(self.spin_fps)
 
-    # Input file selection
-    tk.Label(root, text="Input MP4 File:").grid(
-        row=0, column=0, padx=5, pady=5, sticky="e")
-    entry_input = tk.Entry(root, width=50)
-    entry_input.grid(row=0, column=1, padx=5, pady=5)
-    tk.Button(root, text="Browse", command=browse_input).grid(
-        row=0, column=2, padx=5, pady=5)
+        self.btn_auto_fps = QPushButton("🔍 Detect")
+        self.btn_auto_fps.setObjectName("IconBtn")
+        self.btn_auto_fps.setToolTip("Auto-detect FPS from source video")
+        self.btn_auto_fps.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_auto_fps.clicked.connect(self.auto_detect_fps)
+        fps_container.addWidget(self.btn_auto_fps)
 
-    # Output file selection
-    tk.Label(root, text="Output GIF File:").grid(
-        row=1, column=0, padx=5, pady=5, sticky="e")
-    entry_output = tk.Entry(root, width=50)
-    entry_output.grid(row=1, column=1, padx=5, pady=5)
-    tk.Button(root, text="Browse", command=browse_output).grid(
-        row=1, column=2, padx=5, pady=5)
+        opt_grid.addLayout(fps_container, 0, 1)
 
-    # FPS input with pre-filled value "30"
-    tk.Label(root, text="FPS:").grid(
-        row=2, column=0, padx=5, pady=5, sticky="e")
-    entry_fps = tk.Entry(root)
-    entry_fps.grid(row=2, column=1, padx=5, pady=5, sticky="w")
-    entry_fps.insert(0, "30")
+        # Resolution
+        opt_grid.addWidget(QLabel("Resolution:"), 1, 0)
 
-    # Output size input with pre-filled values 640x480
-    tk.Label(root, text="Output Size (width x height):").grid(
-        row=3, column=0, padx=5, pady=5, sticky="e")
-    entry_width = tk.Entry(root, width=10)
-    entry_width.grid(row=3, column=1, padx=(5, 0), pady=5, sticky="w")
-    entry_width.insert(0, "640")
-    tk.Label(root, text="x").grid(
-        row=3, column=1, padx=(80, 0), pady=5, sticky="w")
-    entry_height = tk.Entry(root, width=10)
-    entry_height.grid(row=3, column=1, padx=(100, 0), pady=5, sticky="w")
-    entry_height.insert(0, "480")
+        res_container = QHBoxLayout()
+        self.spin_width = QSpinBox()
+        self.spin_width.setRange(1, 7680)
+        self.spin_width.setValue(640)
+        self.spin_width.setPrefix("W: ")
 
-    # Convert button
-    tk.Button(root, text="Convert", command=convert_video).grid(
-        row=4, column=1, padx=5, pady=15)
+        self.spin_height = QSpinBox()
+        self.spin_height.setRange(1, 4320)
+        self.spin_height.setValue(480)
+        self.spin_height.setPrefix("H: ")
 
-    root.mainloop()
+        res_container.addWidget(self.spin_width)
+        res_container.addWidget(self.spin_height)
+
+        self.btn_auto_res = QPushButton("🔍 Detect")
+        self.btn_auto_res.setObjectName("IconBtn")
+        self.btn_auto_res.setToolTip(
+            "Auto-detect Resolution from source video")
+        self.btn_auto_res.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_auto_res.clicked.connect(self.auto_detect_resolution)
+        res_container.addWidget(self.btn_auto_res)
+
+        opt_grid.addLayout(res_container, 1, 1)
+
+        settings_layout.addLayout(opt_grid)
+        main_layout.addWidget(settings_frame)
+
+        # Action
+        main_layout.addStretch()
+
+        self.btn_convert = QPushButton("Start Conversion")
+        self.btn_convert.setObjectName("PrimaryBtn")
+        self.btn_convert.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_convert.clicked.connect(self.convert_video)
+        main_layout.addWidget(self.btn_convert)
+
+        # Status Bar
+        self.lbl_status = QLabel("Ready")
+        self.lbl_status.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.lbl_status.setStyleSheet("color: #6c7086; font-size: 12px;")
+        main_layout.addWidget(self.lbl_status)
+
+    # Logic
+
+    def browse_input(self):
+        file_path, _ = QFileDialog.getOpenFileName(
+            self, "Select Input Video", "", "Video Files (*.mp4 *.mov *.avi *.mkv)")
+        if file_path:
+            self.entry_input.setText(file_path)
+            # Autosuggest output
+            if not self.entry_output.text():
+                base, _ = os.path.splitext(file_path)
+                self.entry_output.setText(f"{base}.gif")
+            # Autorun detection
+            self.auto_detect_fps()
+            self.auto_detect_resolution()
+
+    def browse_output(self):
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Save GIF As", "", "GIF Files (*.gif)")
+        if file_path:
+            if not file_path.lower().endswith(".gif"):
+                file_path += ".gif"
+            self.entry_output.setText(file_path)
+
+    def get_video_info(self):
+        """Helper to get video metadata using ffprobe"""
+        input_file = self.entry_input.text()
+        if not input_file or not os.path.exists(input_file):
+            return None
+
+        try:
+            cmd = [
+                "ffprobe", "-v", "error", "-select_streams", "v:0",
+                "-show_entries", "stream=width,height,r_frame_rate",
+                "-of", "json", input_file
+            ]
+            # Hide console window on Windows
+            startupinfo = None
+            if os.name == 'nt':
+                startupinfo = subprocess.STARTUPINFO()
+                startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, check=True, startupinfo=startupinfo)
+            data = json.loads(result.stdout)
+            return data["streams"][0]
+        except Exception as e:
+            print(f"Probe Error: {e}")
+            return None
+
+    def auto_detect_fps(self):
+        self.lbl_status.setText("Analyzing video...")
+        QApplication.processEvents()
+        info = self.get_video_info()
+        if info:
+            fps_str = info.get("r_frame_rate", "30/1")
+            try:
+                num, den = map(int, fps_str.split('/'))
+                if den != 0:
+                    fps = num / den
+                    self.spin_fps.setValue(fps)
+                    self.lbl_status.setText(f"Detected {fps:.2f} FPS")
+            except ValueError:
+                pass
+        else:
+            self.lbl_status.setText("Could not detect FPS")
+
+    def auto_detect_resolution(self):
+        self.lbl_status.setText("Analyzing video...")
+        QApplication.processEvents()
+        info = self.get_video_info()
+        if info:
+            w = info.get("width")
+            h = info.get("height")
+            if w and h:
+                self.spin_width.setValue(int(w))
+                self.spin_height.setValue(int(h))
+                self.lbl_status.setText(f"Detected {w}x{h}")
+        else:
+            self.lbl_status.setText("Could not detect resolution")
+
+    def convert_video(self):
+        input_file = self.entry_input.text()
+        output_file = self.entry_output.text()
+        fps = self.spin_fps.value()
+        width = self.spin_width.value()
+        height = self.spin_height.value()
+
+        if not os.path.exists(input_file):
+            QMessageBox.critical(self, "Error", "Input file does not exist")
+            return
+        if not output_file:
+            QMessageBox.critical(
+                self, "Error", "Please specify an output file")
+            return
+
+        self.btn_convert.setEnabled(False)
+        self.btn_convert.setText("Converting...")
+        QApplication.processEvents()
+
+        # Temp file for palette
+        fd, palette_file = tempfile.mkstemp(suffix=".png")
+        os.close(fd)  # Close handle so ffmpeg can use it
+
+        try:
+            # Startup info to hide console
+            startupinfo = None
+            if os.name == 'nt':
+                startupinfo = subprocess.STARTUPINFO()
+                startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+
+            # Generate Palette
+            self.lbl_status.setText("Phase 1/2: Generating Color Palette...")
+            QApplication.processEvents()
+
+            palette_cmd = [
+                "ffmpeg", "-y", "-i", input_file,
+                "-vf", f"fps={fps},scale={width}:{height}:flags=lanczos,palettegen",
+                palette_file
+            ]
+            subprocess.run(palette_cmd, check=True, startupinfo=startupinfo)
+
+            # Generate GIF
+            self.lbl_status.setText("Phase 2/2: Encoding GIF...")
+            QApplication.processEvents()
+
+            gif_cmd = [
+                "ffmpeg", "-y", "-i", input_file, "-i", palette_file,
+                "-filter_complex", f"fps={fps},scale={width}:{height}:flags=lanczos[x];[x][1:v]paletteuse",
+                output_file
+            ]
+            subprocess.run(gif_cmd, check=True, startupinfo=startupinfo)
+
+            self.lbl_status.setText("Done!")
+            QMessageBox.information(
+                self, "Success", f"GIF saved to:\n{output_file}")
+
+        except subprocess.CalledProcessError:
+            self.lbl_status.setText("Error during conversion")
+            QMessageBox.critical(
+                self, "Error", "FFmpeg failed. Check that ffmpeg is installed")
+        except Exception as e:
+            self.lbl_status.setText("Error")
+            QMessageBox.critical(self, "Error", f"An error occurred:\n{e}")
+        finally:
+            if os.path.exists(palette_file):
+                os.remove(palette_file)
+            self.btn_convert.setEnabled(True)
+            self.btn_convert.setText("Start Conversion")
 
 
 if __name__ == "__main__":
-    start_convert_mp4_to_gif()
+    app = QApplication(sys.argv)
+    window = VideoToGifConverter()
+    window.show()
+    sys.exit(app.exec())

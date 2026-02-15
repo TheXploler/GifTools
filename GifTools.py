@@ -1,56 +1,220 @@
-import tkinter as tk
-from tkinter import messagebox
-from ResizeGif import start_resize_gif
-from EditGifFrames import start_edit_gif_frames
-from ConvertMP4toGIF import start_convert_mp4_to_gif
-from CompressGif import start_compress_gif
-from AddTextToGif import start_add_text_to_gif
-import ttkbootstrap as ttk
+import sys
+from PyQt6.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QGridLayout,
+    QPushButton, QLabel, QFrame
+)
+from PyQt6.QtCore import Qt
+
+try:
+    # Tool Imports
+    from AddTextToGif import GifTextEditor
+    from CompressGif import GifCompressor
+    from ConvertMP4toGIF import VideoToGifConverter
+    from EditGifFrames import GifEditor
+    from ResizeGif import GifConverterApp
+    from CropGif import GifCropper
+    from CropGifWithKeyframes import GifCropper as KeyframeCropper
+    from About import About 
+except ImportError as e:
+    print(f"Error importing modules: {e}")
+    print("Ensure all python tool files are in the same folder")
 
 
-class GifToolsApp:
-    def __init__(self, master):
-        self.master = master
-        master.title("GifTools")
-        master.geometry("400x400")
+class GifToolsLauncher(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Gif Tools")
+        self.resize(500, 600)
 
-        # Frame for the main content
-        frame = ttk.Frame(master, padding=10)
-        frame.pack(padx=10, pady=10, fill=tk.X)
+        self.windows = {}
+        self.init_ui()
 
-        # Title
-        self.title_label = ttk.Label(frame, text="GifTools", font=(
-            "Helvetica", 16), bootstyle="light")
-        self.title_label.pack(pady=(0, 10))
+    def init_ui(self):
+        # Stylesheet 
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color: #1e1e2e;
+            }
+            QWidget {
+                color: #cdd6f4;
+                font-family: 'Segoe UI', 'Helvetica', sans-serif;
+                font-size: 14px;
+            }
+            QLabel#TitleLabel {
+                color: #f5c2e7;
+                font-size: 26px;
+                font-weight: bold;
+                margin-bottom: 10px;
+            }
+            QLabel#SubtitleLabel {
+                color: #bac2de;
+                font-size: 14px;
+                font-style: italic;
+                margin-bottom: 20px;
+            }
+            QPushButton {
+                background-color: #313244;
+                color: #ffffff;
+                border: 1px solid #45475a;
+                border-radius: 8px;
+                padding: 15px;
+                text-align: left;
+                font-weight: bold;
+                font-size: 15px;
+            }
+            QPushButton:hover {
+                background-color: #45475a;
+                border: 1px solid #cba6f7;
+            }
+            QPushButton:pressed {
+                background-color: #585b70;
+            }
+        """)
 
-        # Buttons for each GIF tool
-        self.add_text_button = ttk.Button(
-            frame, text="Add Text to GIF", command=start_add_text_to_gif, bootstyle="success")
-        self.add_text_button.pack(pady=5, fill=tk.X)
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
 
-        self.compress_button = ttk.Button(
-            frame, text="Compress GIF", command=start_compress_gif, bootstyle="info")
-        self.compress_button.pack(pady=5, fill=tk.X)
+        # Main Layout
+        main_layout = QVBoxLayout(central_widget)
+        main_layout.setContentsMargins(30, 40, 30, 40)
+        main_layout.setSpacing(10)
 
-        self.convert_button = ttk.Button(
-            frame, text="Convert MP4 to GIF", command=start_convert_mp4_to_gif, bootstyle="warning")
-        self.convert_button.pack(pady=5, fill=tk.X)
+        # Header Section
+        title = QLabel("GIF Tools")
+        title.setObjectName("TitleLabel")
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        main_layout.addWidget(title)
 
-        self.edit_frames_button = ttk.Button(
-            frame, text="Edit GIF Frames", command=start_edit_gif_frames, bootstyle="primary")
-        self.edit_frames_button.pack(pady=5, fill=tk.X)
+        subtitle = QLabel("Select a tool to begin")
+        subtitle.setObjectName("SubtitleLabel")
+        subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        main_layout.addWidget(subtitle)
 
-        self.resize_button = ttk.Button(
-            frame, text="Resize GIF", command=start_resize_gif, bootstyle="light")
-        self.resize_button.pack(pady=5, fill=tk.X)
+        # Grid Section for Tools
+        grid_layout = QGridLayout()
+        grid_layout.setSpacing(15)
 
-        # Exit button
-        self.exit_button = ttk.Button(
-            frame, text="Exit", command=master.quit, bootstyle="danger")
-        self.exit_button.pack(pady=20, fill=tk.X)
+        # ROW 0
+        # Video Converter
+        self.btn_convert = self.create_button(
+            "🎬  MP4 to GIF", "Convert your MP4 videos to GIF", "#f9e2af")
+        self.btn_convert.clicked.connect(self.launch_convert)
+        grid_layout.addWidget(self.btn_convert, 0, 0, 1, 2)
+        
+        # ROW 1
+        # Text Editor
+        self.btn_text = self.create_button(
+            "Tt  Add Text", "Overlay your GIF with text", "#a6e3a1")
+        self.btn_text.clicked.connect(self.launch_add_text)
+        grid_layout.addWidget(self.btn_text, 1, 0)
+
+        # Frame Editor
+        self.btn_edit = self.create_button(
+            "🎞️  Edit Frames", "Reorder/Delete Frames", "#89b4fa")
+        self.btn_edit.clicked.connect(self.launch_edit_frames)
+        grid_layout.addWidget(self.btn_edit, 1, 1)
+
+        # ROW 2
+        # Standard Crop
+        self.btn_crop = self.create_button(
+            "✂️  Quick Crop", "Crop your GIF", "#cba6f7")
+        self.btn_crop.clicked.connect(self.launch_crop)
+        grid_layout.addWidget(self.btn_crop, 2, 0)
+
+        # Keyframe Crop
+        self.btn_crop_keys = self.create_button(
+            "🏃‍♂️  Adv. Crop", "Crop with keyframe motion", "#f5c2e7")
+        self.btn_crop_keys.clicked.connect(self.launch_crop_keys)
+        grid_layout.addWidget(self.btn_crop_keys, 2, 1)
+
+        # ROW 3
+        # Resize
+        self.btn_resize = self.create_button(
+            "xy  Resize", "Resize your GIF", "#94e2d5")
+        self.btn_resize.clicked.connect(self.launch_resize)
+        grid_layout.addWidget(self.btn_resize, 3, 0)
+
+        # Compress
+        self.btn_compress = self.create_button(
+            "📉  Compress", "Reduce file size", "#fab387")
+        self.btn_compress.clicked.connect(self.launch_compress)
+        grid_layout.addWidget(self.btn_compress, 3, 1)
+
+        # ROW 4
+        # About Button
+        self.btn_about = self.create_button(
+            "ℹ️ About", "App info & version", "#bac2de")
+        self.btn_about.clicked.connect(self.launch_about)
+        grid_layout.addWidget(self.btn_about, 4, 0)
+
+        # Exit Button (Styled as a card now)
+        self.btn_exit = self.create_button(
+            "🚪 Exit", "Close Application", "#f38ba8")
+        self.btn_exit.clicked.connect(self.close)
+        grid_layout.addWidget(self.btn_exit, 4, 1)
+
+        main_layout.addLayout(grid_layout)
+        main_layout.addStretch()
+
+    def create_button(self, title, subtext, accent_color):
+        btn = QPushButton()
+        btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        btn.setMinimumHeight(70)
+
+        # Create a layout inside the button for Title Subtitle
+        layout = QVBoxLayout(btn)
+        layout.setSpacing(2)
+        layout.setContentsMargins(10, 5, 10, 5)
+
+        lbl_title = QLabel(title)
+        lbl_title.setStyleSheet(
+            f"font-size: 16px; font-weight: bold; color: {accent_color}; background: transparent; border: none;")
+
+        lbl_sub = QLabel(subtext)
+        lbl_sub.setStyleSheet(
+            "font-size: 11px; color: #a6adc8; background: transparent; border: none;")
+
+        layout.addWidget(lbl_title)
+        layout.addWidget(lbl_sub)
+
+        return btn
+
+    # Launchers
+    def launch_add_text(self):
+        self.windows['text'] = GifTextEditor()
+        self.windows['text'].show()
+
+    def launch_compress(self):
+        self.windows['compress'] = GifCompressor()
+        self.windows['compress'].show()
+
+    def launch_convert(self):
+        self.windows['convert'] = VideoToGifConverter()
+        self.windows['convert'].show()
+
+    def launch_edit_frames(self):
+        self.windows['edit'] = GifEditor()
+        self.windows['edit'].show()
+
+    def launch_resize(self):
+        self.windows['resize'] = GifConverterApp()
+        self.windows['resize'].show()
+
+    def launch_crop(self):
+        self.windows['crop'] = GifCropper()
+        self.windows['crop'].show()
+
+    def launch_crop_keys(self):
+        self.windows['crop_keys'] = KeyframeCropper()
+        self.windows['crop_keys'].show()
+
+    def launch_about(self):
+        self.windows['about'] = About()
+        self.windows['about'].show()
 
 
 if __name__ == "__main__":
-    root = ttk.Window(themename="superhero")
-    app = GifToolsApp(root)
-    root.mainloop()
+    app = QApplication(sys.argv)
+    window = GifToolsLauncher()
+    window.show()
+    sys.exit(app.exec())
