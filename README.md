@@ -3,7 +3,9 @@
 GifTools is a suite of lightweight tools for editing GIFs. Whether you need to convert an MP4 video into a GIF or resize an existing GIF, GifTools has you covered!
 </p>
 
-![GifTools Window](.github/GifTools.png)
+<p align="center">
+  <img src=".github/GifTools.png" alt="GifTools Window" />
+</p>
 
 ## Tools
 | Tool                | Description                         | Demo                                           |
