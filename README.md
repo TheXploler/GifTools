@@ -1,23 +1,20 @@
-# GifTools
-
+<h1 align="center">GifTools</h1>
+<p align="center">
 GifTools is a suite of lightweight tools for editing GIFs. Whether you need to convert an MP4 video into a GIF or resize an existing GIF, GifTools has you covered!
+</p>
 
-## Features
-
-- **Convert MP4 to GIF:** Transform your MP4 videos into high-quality GIFs quickly and easily.
-- **Resize GIF:** Adjust the dimensions of your GIFs to fit your needs.
-- **Compress GIF:** Reduce the file size of your GIFs to save storage space.
-- **Edit Gif Frames:** Add frames or remove Frames from any GIFs or Create GIFs from single images
-- **Add Text:** Add text to spice up that meme!
+![GifTools Window](.github/GifTools.png)
 
 ## Tools
 | Tool                | Description                         | Demo                                           |
 |---------------------|-------------------------------------|------------------------------------------------|
 | Convert MP4 to GIF  | Convert MP4 videos to GIFs          | ![Convert MP4 to GIF](.github/Mp42Gif.png)     |
+| Add Text to GIF     | Overlay text on GIFs                | ![Add Text To Gif](.github/GifTextEditor.png)     |
+| Edit GIF Frames     | Add, remove, rearrange, and export frame(s) in GIFs           | ![Edit GIF Frames](.github/GifFrameEditor.png) |
+| Quick Crop     | Quickly crops your GIFs           | ![Quick Crop](.github/GifQuickCrop.png) |
+| Advanced Crop     | Quickly crops your GIFs, now with keyframes support           | ![Advanced Crop](.github/GifAdvancedCrop.png) |
 | Resize GIF          | Change GIF dimensions               | ![Resize GIF](.github/GifResize.png)           |
 | Compress GIF        | Reduce GIF file size                | ![Compress GIF](.github/GifCompress.png)       |
-| Edit GIF Frames     | Add/remove frames in GIFs           | ![Edit GIF Frames](.github/GifFrameEditor.png) |
-| Add Text to GIF     | Overlay text on GIFs                | ![AddTextToGif](.github/GifTextEditor.png)     |
 
 ## Installation
 
@@ -40,8 +37,11 @@ python "GifTools.py"
 
 ## Contributing
 
-Contributions are welcome! If you'd like to improve GifTools
+All contributions are welcome!
 
+If you face any issues or have a recommendation for a feature, don't hesitate to open a new issue, Thanks 😊
+
+- Fandrest (TheXploler)
 ## License
 
-Distributed under the GNU GENERAL PUBLIC LICENSE License. See the [LICENSE](LICENSE) file for details.
+[GNU GPLv3](https://choosealicense.com/licenses/gpl-3.0/)
