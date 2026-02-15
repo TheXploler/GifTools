@@ -2,3 +2,6 @@ output
 pygifsicle
 TEST
 __pycache__
+build
+dist
+*.spec
