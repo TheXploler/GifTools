@@ -122,7 +122,7 @@ class GifEditor(QMainWindow):
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
 
-        # --- LEFT: The List (Filmstrip) ---
+        # LEFT: The List (Filmstrip)
         self.list_widget = QListWidget()
         self.list_widget.setViewMode(QListWidget.ViewMode.ListMode)
         self.list_widget.setIconSize(QSize(120, 80)) # Rectangular thumbnails
@@ -137,7 +137,7 @@ class GifEditor(QMainWindow):
 
         main_layout.addWidget(self.list_widget, stretch=1)
 
-        # --- RIGHT: Sidebar Controls ---
+        # RIGHT: Sidebar Controls
         sidebar = QFrame()
         sidebar.setObjectName("Sidebar")
         sidebar.setFixedWidth(300)
@@ -145,7 +145,7 @@ class GifEditor(QMainWindow):
         sidebar_layout.setContentsMargins(20, 20, 20, 20)
         sidebar_layout.setSpacing(15)
 
-        # 1. Info Dashboard
+        # Info Dashboard
         dash_layout = QHBoxLayout()
         self.lbl_count = QLabel("0 Frames")
         self.lbl_count.setStyleSheet("font-size: 16px; font-weight: bold; color: #89b4fa;")
@@ -153,7 +153,7 @@ class GifEditor(QMainWindow):
         dash_layout.addStretch()
         sidebar_layout.addLayout(dash_layout)
 
-        # 2. File Operations
+        # File Operations
         grp_file = QGroupBox("Import")
         layout_file = QVBoxLayout()
         
@@ -168,7 +168,7 @@ class GifEditor(QMainWindow):
         grp_file.setLayout(layout_file)
         sidebar_layout.addWidget(grp_file)
 
-        # 3. Edit Operations
+        # Edit Operations
         grp_edit = QGroupBox("Edit Sequence")
         layout_edit = QVBoxLayout()
         
@@ -184,7 +184,7 @@ class GifEditor(QMainWindow):
         grp_edit.setLayout(layout_edit)
         sidebar_layout.addWidget(grp_edit)
 
-        # 4. Export Settings
+        # Export Settings
         grp_export = QGroupBox("Export")
         layout_export = QVBoxLayout()
         layout_export.setSpacing(10)
@@ -203,11 +203,9 @@ class GifEditor(QMainWindow):
         self.btn_export_frames.clicked.connect(self.export_all_frames)
         layout_export.addWidget(self.btn_export_frames)
 
-        # --- NEW BUTTON ADDED HERE ---
         self.btn_export_selected = QPushButton("💾 Export Selected Only")
         self.btn_export_selected.clicked.connect(self.export_selected_frames)
         layout_export.addWidget(self.btn_export_selected)
-        # -----------------------------
 
         grp_export.setLayout(layout_export)
         sidebar_layout.addWidget(grp_export)
@@ -223,7 +221,7 @@ class GifEditor(QMainWindow):
 
         main_layout.addWidget(sidebar)
 
-    # --- Logic ---
+    # Logic
 
     def update_frame_count(self):
         count = self.list_widget.count()
@@ -377,7 +375,7 @@ class GifEditor(QMainWindow):
                 new_name = f"frame_{i:04d}.png"
                 shutil.copy(original_path, os.path.join(assemble_dir, new_name))
 
-            # FFMPEG Command: Generate Palette first for better quality
+            # Generate Palette first for better quality
             palette_path = os.path.join(assemble_dir, "palette.png")
             
             startupinfo = None
@@ -385,7 +383,7 @@ class GifEditor(QMainWindow):
                 startupinfo = subprocess.STARTUPINFO()
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
-            # 1. Palette Gen
+            # Palette Gen
             cmd_pal = [
                 "ffmpeg", "-y", "-framerate", str(fps),
                 "-i", os.path.join(assemble_dir, "frame_%04d.png"),
@@ -393,7 +391,7 @@ class GifEditor(QMainWindow):
             ]
             subprocess.run(cmd_pal, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, startupinfo=startupinfo)
 
-            # 2. Gif Gen
+            # Gif Gen
             cmd_gif = [
                 "ffmpeg", "-y", "-framerate", str(fps),
                 "-i", os.path.join(assemble_dir, "frame_%04d.png"),
@@ -427,7 +425,6 @@ class GifEditor(QMainWindow):
         
         QMessageBox.information(self, "Success", f"Exported {count} frames.")
 
-    # --- NEW METHOD ADDED HERE ---
     def export_selected_frames(self):
         selected_items = self.list_widget.selectedItems()
         if not selected_items:
@@ -438,7 +435,6 @@ class GifEditor(QMainWindow):
         if not dest_dir: return
 
         # Sort selected items by their visual index in the list
-        # This ensures the exported files are named 001, 002... in the correct timeline order
         selected_items.sort(key=lambda x: self.list_widget.row(x))
 
         count = 0
@@ -451,7 +447,6 @@ class GifEditor(QMainWindow):
                 count += 1
         
         QMessageBox.information(self, "Success", f"Exported {count} selected frames.")
-    # -----------------------------
 
     def closeEvent(self, event):
         if self.temp_dir and os.path.exists(self.temp_dir):
