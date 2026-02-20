@@ -8,11 +8,12 @@ GifTools is a suite of lightweight tools for editing GIFs. Whether you need to c
 ## Tools
 | Tool                | Description                         | Demo                                           |
 |---------------------|-------------------------------------|------------------------------------------------|
-| Convert MP4 to GIF  | Convert MP4 videos to GIFs          | ![Convert MP4 to GIF](.github/Mp42Gif.png)     |
+| Convert Video ↔ GIF  | Convert MP4 videos to GIFs and vice versa | ![Convert Between MP4 and GIF](.github/GifMp4Converter.png)     |
+| Convert MP4 to Frames | Extract image sequences from MP4 videos | ![Convert MP4 to Frames](.github/VTIS.png) |
 | Add Text to GIF     | Overlay text on GIFs                | ![Add Text To Gif](.github/GifTextEditor.png)     |
 | Edit GIF Frames     | Add, remove, rearrange, and export frame(s) in GIFs           | ![Edit GIF Frames](.github/GifFrameEditor.png) |
-| Quick Crop     | Quickly crops your GIFs           | ![Quick Crop](.github/GifQuickCrop.png) |
-| Advanced Crop     | Quickly crops your GIFs, now with keyframes support           | ![Advanced Crop](.github/GifAdvancedCrop.png) |
+| Crop & Rotate     | Crops and rotates your GIFs           | ![Quick Crop](.github/GifQuickCrop.png) |
+| Advanced Crop     | Crops your GIFs, now with keyframes support           | ![Advanced Crop](.github/GifAdvancedCrop.png) |
 | Resize GIF          | Change GIF dimensions               | ![Resize GIF](.github/GifResize.png)           |
 | Compress GIF        | Reduce GIF file size                | ![Compress GIF](.github/GifCompress.png)       |
 

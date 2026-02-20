@@ -98,7 +98,7 @@ class GifToolsLauncher(QMainWindow):
         # ROW 0
         # Video Converter
         self.btn_convert = self.create_button(
-            "🎬  MP4 to GIF", "Convert your MP4 videos to GIF", "#f9e2af")
+            "🎬  Video ↔ GIF", "Convert between MP4 and GIF", "#f9e2af")
         self.btn_convert.clicked.connect(self.launch_convert)
         grid_layout.addWidget(self.btn_convert, 0, 0)
         
