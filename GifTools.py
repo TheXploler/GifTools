@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import (
     QPushButton, QLabel, QFrame
 )
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QIcon, QPixmap
 
 try:
     # Tool Imports
@@ -25,6 +26,7 @@ class GifToolsLauncher(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Gif Tools")
+        self.setWindowIcon(QIcon("Logo.ico"))
         self.resize(500, 600)
 
         self.windows = {}
