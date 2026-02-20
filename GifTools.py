@@ -14,6 +14,7 @@ try:
     from ResizeGif import GifConverterApp
     from CropGif import GifCropper
     from CropGifWithKeyframes import GifCropper as KeyframeCropper
+    from VideoToFrames import VideoToFramesConverter
     from About import About 
 except ImportError as e:
     print(f"Error importing modules: {e}")
@@ -99,7 +100,13 @@ class GifToolsLauncher(QMainWindow):
         self.btn_convert = self.create_button(
             "🎬  MP4 to GIF", "Convert your MP4 videos to GIF", "#f9e2af")
         self.btn_convert.clicked.connect(self.launch_convert)
-        grid_layout.addWidget(self.btn_convert, 0, 0, 1, 2)
+        grid_layout.addWidget(self.btn_convert, 0, 0)
+        
+        # Video to Frames
+        self.btn_extract = self.create_button(
+            "🖼️  MP4 to Frames", "Extract an image sequence", "#fab387")
+        self.btn_extract.clicked.connect(self.launch_extract)
+        grid_layout.addWidget(self.btn_extract, 0, 1)
         
         # ROW 1
         # Text Editor
@@ -117,13 +124,13 @@ class GifToolsLauncher(QMainWindow):
         # ROW 2
         # Standard Crop
         self.btn_crop = self.create_button(
-            "✂️  Quick Crop", "Crop your GIF", "#cba6f7")
+            "✂️  Crop & Rotate", "Crop & Rotate your GIF", "#cba6f7")
         self.btn_crop.clicked.connect(self.launch_crop)
         grid_layout.addWidget(self.btn_crop, 2, 0)
 
         # Keyframe Crop
         self.btn_crop_keys = self.create_button(
-            "🏃‍♂️  Adv. Crop", "Crop with keyframe motion", "#f5c2e7")
+            "🏃‍♂️  Advanced Crop", "Crop with keyframe motion", "#f5c2e7")
         self.btn_crop_keys.clicked.connect(self.launch_crop_keys)
         grid_layout.addWidget(self.btn_crop_keys, 2, 1)
 
@@ -191,6 +198,10 @@ class GifToolsLauncher(QMainWindow):
     def launch_convert(self):
         self.windows['convert'] = VideoToGifConverter()
         self.windows['convert'].show()
+
+    def launch_extract(self):
+        self.windows['extract'] = VideoToFramesConverter()
+        self.windows['extract'].show()
 
     def launch_edit_frames(self):
         self.windows['edit'] = GifEditor()
