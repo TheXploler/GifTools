@@ -118,7 +118,7 @@ class About(QWidget):
         lbl_name.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         # Version
-        self.lbl_ver = ClickableLabel("v3.0")
+        self.lbl_ver = ClickableLabel("v4.0")
         self.lbl_ver.setObjectName("Version")
         self.lbl_ver.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.lbl_ver.setCursor(Qt.CursorShape.PointingHandCursor)
