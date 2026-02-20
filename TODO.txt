@@ -1,3 +1,1 @@
-+ Rotate GIF Feature
-+ Integrate VTIS (Just use the existing edit frames tool but only enable the export frames)
 Gifski?
