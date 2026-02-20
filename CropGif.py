@@ -10,7 +10,7 @@ from PyQt6.QtWidgets import (
     QSizePolicy
 )
 from PyQt6.QtCore import Qt, QRect, QSize, QPoint, pyqtSignal, QTimer
-from PyQt6.QtGui import QPainter, QColor, QPen, QBrush, QMovie, QIcon, QPalette
+from PyQt6.QtGui import QPainter, QColor, QPen, QBrush, QMovie, QIcon, QPalette, QTransform
 
 # Constants
 ACCENT_COLOR = QColor("#cba6f7")  # Bootleg Catppuccin
@@ -67,6 +67,7 @@ class CropLabel(QLabel):
         self.selection_rect = QRect()
         self.pixmap_ref = None
         self.scale_factor = 1.0
+        self.rotation_angle = 0
 
         self.mode = EditMode.NONE
         self.active_handle = ResizeSide.NONE
@@ -81,12 +82,27 @@ class CropLabel(QLabel):
         self.scale_factor = scale_value
         self.refresh_display()
 
+    def set_rotation(self, angle):
+        self.rotation_angle = angle
+        self.refresh_display()
+
+    def _get_base_rect(self):
+        if not self.pixmap_ref:
+            return QRect()
+        if self.rotation_angle in (90, 270):
+            return QRect(0, 0, self.pixmap_ref.height(), self.pixmap_ref.width())
+        return self.pixmap_ref.rect()
+
     def refresh_display(self):
-        if self.pixmap_ref:
-            scaled_w = int(self.pixmap_ref.width() * self.scale_factor)
-            scaled_h = int(self.pixmap_ref.height() * self.scale_factor)
+        pix = self.pixmap_ref
+        if pix is not None:
+            transform = QTransform().rotate(self.rotation_angle)
+            rotated_pix = pix.transformed(transform, Qt.TransformationMode.SmoothTransformation)
+            
+            scaled_w = int(rotated_pix.width() * self.scale_factor)
+            scaled_h = int(rotated_pix.height() * self.scale_factor)
             mode = Qt.TransformationMode.FastTransformation if self.scale_factor < 1.0 else Qt.TransformationMode.SmoothTransformation
-            scaled_pix = self.pixmap_ref.scaled(
+            scaled_pix = rotated_pix.scaled(
                 scaled_w, scaled_h, Qt.AspectRatioMode.KeepAspectRatio, mode)
             self.setPixmap(scaled_pix)
             self.setFixedSize(scaled_pix.size())
@@ -94,7 +110,7 @@ class CropLabel(QLabel):
 
     def set_selection(self, x, y, w, h):
         if self.pixmap_ref:
-            img_rect = self.pixmap_ref.rect()
+            img_rect = self._get_base_rect()
             safe_w = max(1, min(w, img_rect.width()))
             safe_h = max(1, min(h, img_rect.height()))
             max_x = img_rect.width() - safe_w
@@ -176,7 +192,7 @@ class CropLabel(QLabel):
     def mouseMoveEvent(self, event):
         screen_pos = event.pos()
         orig_pos = self._to_original(screen_pos)
-        img_rect = self.pixmap_ref.rect()
+        img_rect = self._get_base_rect()
 
         if self.mode == EditMode.NONE:
             self._update_cursor(screen_pos)
@@ -260,7 +276,7 @@ class CropLabel(QLabel):
     def _handle_resize(self, orig_pos):
         r = QRect(self.rect_start_geo)
         l, t, r_edge, b = r.left(), r.top(), r.right(), r.bottom()
-        img_rect = self.pixmap_ref.rect()
+        img_rect = self._get_base_rect()
         x = max(0, min(orig_pos.x(), img_rect.right()))
         y = max(0, min(orig_pos.y(), img_rect.bottom()))
 
@@ -287,6 +303,7 @@ class GifCropper(QMainWindow):
         self.is_playing = False
         self.updating_spinboxes = False
         self.block_seek_update = False
+        self.rotation = 0
 
         self.init_ui()
 
@@ -468,6 +485,22 @@ class GifCropper(QMainWindow):
         play_group.setLayout(play_layout)
         sidebar_layout.addWidget(play_group)
 
+        # Rotation Group
+        rot_group = QGroupBox("Rotation")
+        rot_layout = QHBoxLayout()
+        self.btn_rot_ccw = QPushButton("↺ CCW")
+        self.btn_rot_cw = QPushButton("↻ CW")
+        self.btn_rot_ccw.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_rot_cw.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_rot_ccw.clicked.connect(self.rotate_ccw)
+        self.btn_rot_cw.clicked.connect(self.rotate_cw)
+        self.btn_rot_ccw.setEnabled(False)
+        self.btn_rot_cw.setEnabled(False)
+        rot_layout.addWidget(self.btn_rot_ccw)
+        rot_layout.addWidget(self.btn_rot_cw)
+        rot_group.setLayout(rot_layout)
+        sidebar_layout.addWidget(rot_group)
+
         # Zoom Group
         zoom_group = QGroupBox("Canvas View")
         zoom_layout = QHBoxLayout()
@@ -538,6 +571,30 @@ class GifCropper(QMainWindow):
         sb.setEnabled(False)
         return sb
 
+    def rotate_cw(self):
+        self.rotation = (self.rotation + 90) % 360
+        self.apply_rotation()
+
+    def rotate_ccw(self):
+        self.rotation = (self.rotation - 90) % 360
+        self.apply_rotation()
+
+    def apply_rotation(self):
+        self.image_label.set_rotation(self.rotation)
+        self.updating_spinboxes = True
+        self.spin_x.setValue(0)
+        self.spin_y.setValue(0)
+        self.spin_w.setValue(0)
+        self.spin_h.setValue(0)
+        self.image_label.selection_rect = QRect()
+        self.image_label.update()
+        self.updating_spinboxes = False
+
+        if hasattr(self.image_label, '_get_base_rect') and self.image_label._get_base_rect().isValid():
+            w = self.image_label._get_base_rect().width()
+            h = self.image_label._get_base_rect().height()
+            self.lbl_info.setText(f"{os.path.basename(self.input_path)}\n{w} x {h} px")
+
     # Logic
     def open_gif(self):
         file_path, _ = QFileDialog.getOpenFileName(
@@ -573,10 +630,12 @@ class GifCropper(QMainWindow):
 
         # Reset UI
         self.zoom_slider.setValue(100)
+        self.rotation = 0
+        self.image_label.set_rotation(self.rotation)
         for sb in [self.spin_x, self.spin_y, self.spin_w, self.spin_h]:
             sb.setEnabled(True)
 
-        for btn in [self.btn_play, self.btn_pause, self.btn_stop, self.seek_slider, self.btn_crop_save]:
+        for btn in [self.btn_play, self.btn_pause, self.btn_stop, self.seek_slider, self.btn_crop_save, self.btn_rot_ccw, self.btn_rot_cw]:
             btn.setEnabled(True)
 
         self.seek_slider.setRange(0, self.movie.frameCount() - 1)
@@ -682,8 +741,22 @@ class GifCropper(QMainWindow):
 
         x, y, w, h = rect.x(), rect.y(), rect.width(), rect.height()
 
+        # Rotation filters
+        transpose_filters = []
+        if self.rotation == 90:
+            transpose_filters.append("transpose=1")
+        elif self.rotation == 180:
+            transpose_filters.append("transpose=1,transpose=1")
+        elif self.rotation == 270:
+            transpose_filters.append("transpose=2")
+        
+        transpose_str = ",".join(transpose_filters)
+
         # Palette generation filter
-        filter_complex = f"crop={w}:{h}:{x}:{y},split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse"
+        if transpose_str:
+            filter_complex = f"{transpose_str},crop={w}:{h}:{x}:{y},split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse"
+        else:
+            filter_complex = f"crop={w}:{h}:{x}:{y},split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse"
 
         cmd = [
             "ffmpeg", "-y",
