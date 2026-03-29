@@ -251,7 +251,7 @@ class About(QWidget):
         remaining = self.max_clicks - self.click_count
 
         if remaining > 0 and remaining < 4:
-            self.lbl_ver.setText(f"v1.0.0 ({remaining})")
+            self.lbl_ver.setText(f"v4.0.0 ({remaining})")
             self.lbl_ver.setStyleSheet("color: #fab387; font-style: italic;")
 
         if self.click_count >= self.max_clicks:
